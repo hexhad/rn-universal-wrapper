@@ -7,15 +7,19 @@ import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { Text, View } from "react-native";
+import { ThemeProvider } from "./theme/ThemContex";
 
 
 const LoaderComp = () => {
   return (
-    <View><Text>Hello</Text></View>
+    <View>
+      <Text>Loading</Text>
+    </View>
   );
 };
 const App = () => {
   const ProviderTree = buildProvidersTree([
+    [ThemeProvider],
     [Provider, { store }],
     [PersistGate, { persistor, loading: <LoaderComp /> }],
     [NavigationContainer, { ref }],
