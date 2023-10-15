@@ -1,12 +1,43 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { mmkvStorage } from "../redux/persist/storage";
 
-export const ThemeContext = createContext("light");
+export const ThemeContext = createContext();
+
+
+const MAIN_STATES = {
+  DARK: "dark",
+  LIGHT: "light",
+  NAME: "theme",
+};
 
 const ThemeProvider = ({ children }) => {
-  const [selectedTheme, setSelectedTheme] = useState("light");
+  const [selectedTheme, setSelectedTheme] = useState(getInitialState);
+
+  const getInitialState = async () => {
+    try {
+      const theme = await mmkvStorage.getItem(MAIN_STATES.NAME);
+      setSelectedTheme(!!theme ? theme : MAIN_STATES.LIGHT);
+    } catch (e) {
+      setSelectedTheme(MAIN_STATES.LIGHT);
+    }
+  };
+
+  useEffect(() => {
+    getInitialState();
+  }, []);
+
+
+  const setThemeState = async (theme) => {
+    await mmkvStorage.setItem(MAIN_STATES.NAME, theme ?? MAIN_STATES.LIGHT);
+  };
+
 
   const toggleState = () => {
-    setSelectedTheme(prevState => prevState === "light" ? "dark" : "light");
+    setSelectedTheme(prevState => {
+      let newState = prevState === MAIN_STATES.LIGHT ? MAIN_STATES.DARK : MAIN_STATES.LIGHT;
+      setThemeState(newState);
+      return newState;
+    });
   };
 
   return (
